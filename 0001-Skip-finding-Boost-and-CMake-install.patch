@@ -1,0 +1,68 @@
+From 2a603a64e83c2ea2c9a26c7ef6bdf1337f80452a Mon Sep 17 00:00:00 2001
+From: lynxnb <niccolo.betto@gmail.com>
+Date: Mon, 3 Jul 2023 22:51:33 +0200
+Subject: [PATCH] Skip finding Boost and CMake install
+
+---
+ CMakeLists.txt           | 9 ++++++++-
+ externals/CMakeLists.txt | 4 ++--
+ 2 files changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2381ab7e..60106673 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -23,6 +23,7 @@ option(DYNARMIC_USE_LLVM "Support disassembly of jitted x86_64 code using LLVM"
+ option(DYNARMIC_USE_PRECOMPILED_HEADERS "Use precompiled headers" ON)
+ option(DYNARMIC_USE_BUNDLED_EXTERNALS "Use all bundled externals (useful when e.g. cross-compiling)" OFF)
+ option(DYNARMIC_WARNINGS_AS_ERRORS "Warnings as errors" ${MASTER_PROJECT})
++option(DYNARMIC_INSTALL "Install Dynarmic" ON)
+ if (NOT DEFINED DYNARMIC_FRONTENDS)
+     set(DYNARMIC_FRONTENDS "A32;A64" CACHE STRING "Selects which frontends to enable")
+ endif()
+@@ -129,7 +130,9 @@ if (DYNARMIC_USE_BUNDLED_EXTERNALS)
+     set(CMAKE_DISABLE_FIND_PACKAGE_Zydis ON)
+ endif()
+ 
+-find_package(Boost 1.57 REQUIRED)
++if (NOT TARGET Boost::boost)
++    find_package(Boost 1.57 REQUIRED)
++endif()
+ find_package(fmt 9 QUIET)
+ find_package(mcl 0.1.12 EXACT QUIET)
+ find_package(tsl-robin-map QUIET)
+@@ -163,6 +166,10 @@ endif()
+ #
+ # Install
+ #
++if (NOT DYNARMIC_INSTALL)
++    return()
++endif()
++
+ include(GNUInstallDirs)
+ include(CMakePackageConfigHelpers)
+ 
+diff --git a/externals/CMakeLists.txt b/externals/CMakeLists.txt
+index 72e90f3b..20ff04d9 100644
+--- a/externals/CMakeLists.txt
++++ b/externals/CMakeLists.txt
+@@ -27,14 +27,14 @@ endif()
+ 
+ if (NOT TARGET fmt::fmt)
+     # fmtlib formatting library
+-    set(FMT_INSTALL ON)
++    set(FMT_INSTALL ${DYNARMIC_INSTALL})
+     add_subdirectory(fmt)
+ endif()
+ 
+ # mcl
+ 
+ if (NOT TARGET merry::mcl)
+-    set(MCL_INSTALL ON)
++    set(MCL_INSTALL ${DYNARMIC_INSTALL})
+     add_subdirectory(mcl)
+ endif()
+ 
+-- 
+2.40.1.windows.1
+
