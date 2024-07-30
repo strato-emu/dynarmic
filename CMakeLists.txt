@@ -23,6 +23,7 @@ option(DYNARMIC_USE_LLVM "Support disassembly of jitted x86_64 code using LLVM" 
 option(DYNARMIC_USE_PRECOMPILED_HEADERS "Use precompiled headers" ON)
 option(DYNARMIC_USE_BUNDLED_EXTERNALS "Use all bundled externals (useful when e.g. cross-compiling)" OFF)
 option(DYNARMIC_WARNINGS_AS_ERRORS "Warnings as errors" ${MASTER_PROJECT})
+option(DYNARMIC_INSTALL "Install Dynarmic" ON)
 if (NOT DEFINED DYNARMIC_FRONTENDS)
     set(DYNARMIC_FRONTENDS "A32;A64" CACHE STRING "Selects which frontends to enable")
 endif()
@@ -140,7 +141,9 @@ if (DYNARMIC_USE_BUNDLED_EXTERNALS)
     set(CMAKE_DISABLE_FIND_PACKAGE_Zydis ON)
 endif()
 
-find_package(Boost 1.57 REQUIRED)
+if (NOT TARGET Boost::boost)
+    find_package(Boost 1.57 REQUIRED)
+endif()
 find_package(fmt 9 CONFIG)
 find_package(mcl 0.1.12 EXACT CONFIG)
 find_package(tsl-robin-map CONFIG)
@@ -182,6 +185,10 @@ endif()
 #
 # Install
 #
+if (NOT DYNARMIC_INSTALL)
+    return()
+endif()
+
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 

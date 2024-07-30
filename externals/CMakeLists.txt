@@ -35,14 +35,14 @@ endif()
 
 if (NOT TARGET fmt::fmt)
     # fmtlib formatting library
-    set(FMT_INSTALL ON)
+    set(FMT_INSTALL ${DYNARMIC_INSTALL})
     add_subdirectory(fmt)
 endif()
 
 # mcl
 
 if (NOT TARGET merry::mcl)
-    set(MCL_INSTALL ON)
+    set(MCL_INSTALL ${DYNARMIC_INSTALL})
     add_subdirectory(mcl)
 endif()
 
